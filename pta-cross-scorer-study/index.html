@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A cross-scorer study of what GRPO post-training added on math and code, accepted at the PTA workshop at NeurIPS 2026.">
+  <title>Can We Tell What GRPO Post-Training Added?</title>
+  <style>
+    :root { color-scheme: light; --ink: #142d3c; --muted: #4a6271; --accent: #08645d; --rule: #d6e1e5; --canvas: #f8fafb; }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; background: var(--canvas); color: var(--ink); font: 1rem/1.65 'Segoe UI', system-ui, sans-serif; }
+    a { color: var(--accent); text-underline-offset: .22em; }
+    a:focus-visible { outline: 3px solid #bc5f25; outline-offset: 4px; }
+    .shell { width: min(100% - 3rem, 68rem); margin-inline: auto; }
+    .masthead { border-bottom: 1px solid var(--rule); }
+    .masthead .shell { display: flex; justify-content: space-between; gap: 1rem; align-items: center; padding: .9rem 0; font-size: .9rem; }
+    .venue { font-weight: 700; }
+    .hero { padding: clamp(3rem, 7vw, 6rem) 0 clamp(2.5rem, 5vw, 4rem); }
+    h1, h2 { line-height: 1.1; letter-spacing: -.025em; }
+    h1 { max-width: 18ch; font-size: clamp(2.5rem, 6.2vw, 5rem); margin: 0; font-weight: 730; }
+    .subtitle { color: var(--accent); font-size: clamp(1.2rem, 2.7vw, 1.8rem); font-weight: 650; margin: .9rem 0 0; }
+    .byline { margin: 1.3rem 0 .55rem; font-weight: 650; }
+    .byline span { color: var(--muted); font-weight: 400; }
+    .hero-copy { max-width: 63ch; margin: .8rem 0 1.55rem; color: var(--muted); font-size: 1.07rem; }
+    .links { display: flex; flex-wrap: wrap; gap: .65rem; }
+    .links a { display: inline-flex; align-items: center; min-height: 2.7rem; border-radius: .3rem; border: 1px solid var(--rule); padding: .4rem .85rem; font-weight: 650; text-decoration: none; }
+    .links .primary { background: var(--accent); border-color: var(--accent); color: white; }
+    .links .primary:hover { background: #064d47; }
+    .links .secondary:hover { background: #eaf2f4; }
+    .results { display: grid; grid-template-columns: 2fr 1fr; align-items: start; gap: clamp(1.25rem, 4vw, 3rem); border-top: 1px solid var(--rule); padding: 2.35rem 0 2.7rem; }
+    h2 { margin: 0 0 .7rem; font-size: clamp(1.5rem, 3vw, 2rem); }
+    p { margin: 0 0 1rem; }
+    .results p, .limits p { color: var(--muted); }
+    .numbers { margin: 0; border-left: .2rem solid var(--accent); padding: .15rem 0 .15rem 1.15rem; }
+    .numbers dt { font-size: 1.9rem; font-variant-numeric: tabular-nums; font-weight: 700; line-height: 1.2; }
+    .numbers dd { margin: .22rem 0 1.15rem; color: var(--muted); }
+    .numbers dd:last-child { margin-bottom: 0; }
+    .method { margin: 0 0 2rem; padding: 1.4rem 1.55rem .9rem; border: 1px solid var(--rule); border-radius: .4rem; background: #edf4f6; }
+    .method p { max-width: 78ch; color: var(--muted); }
+    .figures { display: grid; gap: 1.3rem; }
+    figure { margin: 0; border: 1px solid var(--rule); background: white; border-radius: .4rem; overflow: hidden; }
+    figure img { display: block; width: 100%; height: auto; padding: clamp(.55rem, 2vw, 1.4rem); }
+    figcaption { display: block; padding: .9rem 1.25rem 1rem; border-top: 1px solid var(--rule); color: var(--muted); }
+    figcaption strong { color: var(--ink); }
+    .limits { padding: 2.8rem 0 2rem; max-width: 76ch; }
+    footer { border-top: 1px solid var(--rule); color: var(--muted); padding: 1.15rem 0; font-size: .9rem; }
+    @media (max-width: 42rem) {
+      .shell { width: calc(100% - 2rem); }
+      .results { grid-template-columns: 1fr; }
+      .masthead .shell { align-items: start; }
+    }
+  </style>
+</head>
+<body>
+  <header class="masthead">
+    <div class="shell">
+      <span class="venue">NeurIPS 2026 · PTA Workshop</span>
+      <a href="https://ptaworkshop.github.io/accepted-papers.html">Workshop listing</a>
+    </div>
+  </header>
+  <main class="shell">
+    <section class="hero" aria-labelledby="paper-title">
+      <h1 id="paper-title">Can We Tell What GRPO Post-Training Added?</h1>
+      <p class="subtitle">A Cross-Scorer Study Across Math and Code</p>
+      <p class="byline">Masoud Fetanat <span>· UNSW Sydney</span></p>
+      <p class="hero-copy">A post-training gain depends on the scorer used to measure it. We score the same saved outputs with several evaluators to see when they agree and when the baseline leaves too little room to measure improvement.</p>
+      <div class="links">
+        <a class="primary" href="https://openreview.net/forum?id=cxDw0En8jX">Paper on OpenReview</a>
+        <a class="secondary" href="https://arxiv.org/abs/2611.01572">Companion replay study</a>
+        <a class="secondary" href="#figures">Study figures</a>
+      </div>
+    </section>
+    <section class="results" aria-labelledby="findings">
+      <div>
+        <h2 id="findings">What the scorers agree on</h2>
+        <p>The paper reports higher math Pass@32 scores for all seven post-trained checkpoints under each of the five scorers. Their checkpoint rankings broadly agree. The rank intervals resample checkpoints and leave prompt-level uncertainty open.</p>
+        <p>On code, both language-model judges already score the baseline above 0.95. The observed gains range from 0.0024 to 0.0143 in Pass@32. Those gains lack paired uncertainty estimates, so the available evidence leaves the effect of post-training unresolved.</p>
+      </div>
+      <dl class="numbers">
+        <dt>0.764–1.000</dt>
+        <dd>Math Kendall τ across the ten scorer pairs</dd>
+        <dt>Above 0.95</dt>
+        <dd>Code baseline Pass@32 under both judges</dd>
+      </dl>
+    </section>
+    <section class="method" aria-labelledby="setup-title">
+      <h2 id="setup-title">How we measured post-training gains</h2>
+      <p>We compared Qwen2.5-7B-Instruct before and after Group Relative Policy Optimization (GRPO). For each checkpoint, we sampled 32 answers per question and scored the same answers under each evaluator. The evaluation used 1,819 math prompts and 421 code prompts. The math comparison keeps five scorers. The trained-code comparison uses the two language-model judges.</p>
+    </section>
+    <div class="figures" id="figures">
+      <figure>
+        <img src="assets/pretrained-baseline.png" alt="Pass at 32 for the Qwen baseline. The five math scores cluster near 0.65, while the two code judge scores are above 0.95.">
+        <figcaption><strong>Baseline headroom.</strong> Pass@32 measures whether at least one of 32 sampled answers passes the scorer. The dotted area is the gap from the baseline score to one. Code shows the two judges used for the trained-checkpoint comparison.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/judge-resolution.png" alt="Observed gains relative to the baseline. The math gains are larger, while the two code judges report small and differing gains for three judge-trained runs.">
+        <figcaption><strong>Gains across checkpoints.</strong> Each range spans the available trained checkpoints for that domain and judge. The three code comparisons use judge scores on cached outputs. Paired uncertainty intervals are unavailable for these gains.</figcaption>
+      </figure>
+    </div>
+    <section class="limits" aria-labelledby="limits-title">
+      <h2 id="limits-title">Scope of the study</h2>
+      <p>The study post-trains one base model, Qwen-2.5-7B-Instruct. Three code runs used a defective execution verifier and were excluded. The trained-checkpoint results use the original saved outputs. A later replay produced more malformed outputs, and the source of that discrepancy remains unresolved.</p>
+    </section>
+  </main>
+  <footer><div class="shell">From Pretrained Representations to Acting Agents · NeurIPS 2026</div></footer>
+</body>
+</html>
